@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 500" role="img" aria-label="Team photo placeholder">
+  <rect width="400" height="500" fill="#eef1f6"/>
+  <rect x="1" y="1" width="398" height="498" fill="none" stroke="#d4dbe6" stroke-width="2"/>
+  <circle cx="200" cy="190" r="56" fill="#d4dbe6"/>
+  <path d="M80 420c28-72 88-112 120-112s92 40 120 112" fill="#d4dbe6"/>
+  <text x="200" y="460" text-anchor="middle" fill="#5a6578" font-family="system-ui,sans-serif" font-size="14">Photo coming soon</text>
+</svg>
