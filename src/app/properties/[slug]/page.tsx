@@ -3,8 +3,11 @@ import { notFound } from "next/navigation";
 import { MapPin, BedDouble, Bath, Ruler, CheckCircle2, Phone, Mail } from "lucide-react";
 import { PropertyGallery } from "@/components/property/PropertyGallery";
 import { PageHeader } from "@/components/ui/PageHeader";
-import { ContactForm } from "@/components/forms/ContactForm";
-import { getAllProperties, getPropertyBySlug } from "@/lib/mock-data";
+import { EnquiryForm } from "@/components/forms/EnquiryForm";
+import {
+  getAllPropertySlugs,
+  getPublishedPropertyBySlug,
+} from "@/server/db/queries/properties";
 import { formatPrice, availabilityLabel } from "@/lib/utils";
 import {
   buildPropertyWhatsAppLink,
@@ -17,13 +20,17 @@ interface PageProps {
   params: Promise<{ slug: string }>;
 }
 
-export function generateStaticParams() {
-  return getAllProperties().map((p) => ({ slug: p.slug }));
+export const revalidate = 300;
+export const dynamicParams = true;
+
+export async function generateStaticParams() {
+  const slugs = await getAllPropertySlugs();
+  return slugs.map((slug) => ({ slug }));
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params;
-  const property = getPropertyBySlug(slug);
+  const property = await getPublishedPropertyBySlug(slug);
   return {
     title: property
       ? `${property.title} | Brookfield Realty & Investment Ltd.`
@@ -40,9 +47,11 @@ const availabilityStyles: Record<string, string> = {
 
 export default async function PropertyDetailsPage({ params }: PageProps) {
   const { slug } = await params;
-  const property = getPropertyBySlug(slug);
+  const property = await getPublishedPropertyBySlug(slug);
 
   if (!property) notFound();
+
+  const propertyOption = { slug: property.slug, title: property.title };
 
   return (
     <>
@@ -113,8 +122,9 @@ export default async function PropertyDetailsPage({ params }: PageProps) {
 
           <div id="enquire" className="mt-14 pt-10 border-t hairline scroll-mt-24">
             <h2 className="font-serif text-2xl text-ink mb-4">Make an enquiry</h2>
-            <ContactForm
-              defaultSubject={`Enquiry: ${property.title}`}
+            <EnquiryForm
+              mode="property"
+              property={propertyOption}
               defaultMessage={`I would like more information about ${property.title} in ${property.location}.`}
               submitLabel="Make an enquiry"
             />
@@ -122,8 +132,9 @@ export default async function PropertyDetailsPage({ params }: PageProps) {
 
           <div id="inspect" className="mt-14 pt-10 border-t hairline scroll-mt-24">
             <h2 className="font-serif text-2xl text-ink mb-4">Request an inspection</h2>
-            <ContactForm
-              defaultSubject={`Inspection request: ${property.title}`}
+            <EnquiryForm
+              mode="inspection"
+              property={propertyOption}
               defaultMessage={`I would like to schedule an inspection for ${property.title}.`}
               submitLabel="Request an inspection"
             />

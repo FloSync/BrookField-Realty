@@ -8,7 +8,7 @@ export const OFFICE_HOURS = "Sun – Fri: 9AM – 5PM";
 export const PHONE_DISPLAY = "+234 806 750 9840";
 export const PHONE_TEL = "+2348067509840";
 
-export const EMAIL = "brookfieldrealtorltd@gmail.com";
+export const EMAIL = "contact@brookfieldrealtyltd.com";
 
 export const WHATSAPP_NUMBER = "2348067509840";
 

@@ -3,6 +3,7 @@ import { revalidatePath } from "next/cache";
 export function revalidateProperties(slug?: string): void {
   revalidatePath("/");
   revalidatePath("/properties");
+  revalidatePath("/contact");
   if (slug) revalidatePath(`/properties/${slug}`);
 }
 
@@ -16,4 +17,8 @@ export function revalidateTeam(): void {
 
 export function revalidateCareers(): void {
   revalidatePath("/careers");
+}
+
+export function revalidateContact(): void {
+  revalidatePath("/contact");
 }

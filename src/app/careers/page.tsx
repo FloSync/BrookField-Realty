@@ -2,14 +2,16 @@ import type { Metadata } from "next";
 import { Briefcase, MapPin, Clock } from "lucide-react";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { Button } from "@/components/ui/Button";
-import { getJobOpenings } from "@/lib/mock-data";
+import { getPublishedCareers } from "@/server/db/queries/careers";
 
 export const metadata: Metadata = {
   title: "Careers | Brookfield Realty & Investment Ltd.",
 };
 
-export default function CareersPage() {
-  const jobs = getJobOpenings();
+export const revalidate = 300;
+
+export default async function CareersPage() {
+  const jobs = await getPublishedCareers();
 
   return (
     <>

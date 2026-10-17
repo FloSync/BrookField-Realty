@@ -54,6 +54,9 @@ Visit `/admin/login` with the email/password you set in `.env.local`.
 
 ## Deploying
 
+See **`docs/DEPLOYMENT.md`** for production D1, admin, email, and Turnstile setup.
+See **`docs/CONTENT_SYNC.md`** for VS Code ↔ D1 content workflow.
+
 See `src/server/db/README.md` for wiring a real D1 binding and
 `src/server/storage/README.md` for R2, if deploying directly to Cloudflare
 Pages/Workers — the primary supported path, since it's also the only way

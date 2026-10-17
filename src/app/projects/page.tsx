@@ -3,14 +3,16 @@ import { PageHeader } from "@/components/ui/PageHeader";
 import { ProjectCard } from "@/components/projects/ProjectCard";
 import { CTASection } from "@/components/ui/CTASection";
 import { ContactCTAStrip } from "@/components/ui/ContactCTAStrip";
-import { getAllProjects } from "@/lib/mock-data";
+import { getPublishedProjects } from "@/server/db/queries/projects";
 
 export const metadata: Metadata = {
   title: "Projects & Estates | Brookfield Realty & Investment Ltd.",
 };
 
-export default function ProjectsPage() {
-  const projects = getAllProjects();
+export const revalidate = 300;
+
+export default async function ProjectsPage() {
+  const projects = await getPublishedProjects();
 
   return (
     <>

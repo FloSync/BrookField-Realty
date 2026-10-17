@@ -8,7 +8,9 @@ import { TeamMemberCard } from "@/components/team/TeamMemberCard";
 import { BlogCard } from "@/components/blog/BlogCard";
 import { HomeHero } from "@/components/home/HomeHero";
 import { SectionBackdrop } from "@/components/ui/SectionBackdrop";
-import { getLatestHomeProperties, getTeamBoard, getTeamStaff } from "@/lib/mock-data";
+import { getLatestHomeProperties } from "@/server/db/queries/properties";
+import { getPublishedTeam } from "@/server/db/queries/team";
+import { splitPublishedTeam } from "@/lib/team-groups";
 import { SECTION_BACKDROP_IMAGE_QUALITY } from "@/lib/property-image";
 import { getBlogPosts } from "@/lib/blog-data";
 import {
@@ -26,10 +28,14 @@ import {
 } from "@/lib/site-content";
 import { sectionBackgrounds } from "@/lib/section-backgrounds";
 
-export default function HomePage() {
-  const latestProperties = getLatestHomeProperties();
-  const boardPreview = getTeamBoard();
-  const teamPreview = getTeamStaff().slice(0, 4);
+export const revalidate = 300;
+
+export default async function HomePage() {
+  const latestProperties = await getLatestHomeProperties();
+  const { board: boardPreview, staff: teamStaff } = splitPublishedTeam(
+    await getPublishedTeam()
+  );
+  const teamPreview = teamStaff.slice(0, 4);
   const blogPosts = getBlogPosts().slice(0, 2);
   const topServices = services.slice(0, 3);
 

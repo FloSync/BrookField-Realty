@@ -13,14 +13,16 @@ import {
   EMAIL_ADDRESS,
 } from "@/lib/nav-links";
 import { OFFICE_ADDRESS, OFFICE_HOURS } from "@/lib/company";
-import { getAllProperties } from "@/lib/mock-data";
+import { getPublishedProperties } from "@/server/db/queries/properties";
 
 export const metadata: Metadata = {
   title: `Contact | ${BRAND.name}`,
 };
 
-export default function ContactPage() {
-  const propertyOptions = getAllProperties().map((p) => ({
+export const revalidate = 300;
+
+export default async function ContactPage() {
+  const propertyOptions = (await getPublishedProperties()).map((p) => ({
     slug: p.slug,
     title: p.title,
   }));
