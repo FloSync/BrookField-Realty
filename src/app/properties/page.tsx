@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { PropertiesPageCatalog } from "@/components/property/PropertiesPageCatalog";
-import { getAllProperties } from "@/lib/mock-data";
+import { getPublishedProperties } from "@/server/db/queries/properties";
 
 export const metadata: Metadata = {
   title: "Properties | Brookfield Realty & Investment Ltd.",
@@ -9,8 +9,10 @@ export const metadata: Metadata = {
     "Browse land, houses, and commercial properties for sale across Lagos, Oyo, and Brookfield estates.",
 };
 
-export default function PropertiesPage() {
-  const forSale = getAllProperties().filter((p) => p.listingType !== "rent");
+export const revalidate = 300;
+
+export default async function PropertiesPage() {
+  const forSale = (await getPublishedProperties()).filter((p) => p.listingType !== "rent");
 
   return (
     <>

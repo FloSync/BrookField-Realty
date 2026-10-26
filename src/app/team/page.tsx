@@ -3,7 +3,8 @@ import Link from "next/link";
 import { TeamMemberCard } from "@/components/team/TeamMemberCard";
 import { CTASection } from "@/components/ui/CTASection";
 import { SectionBackdrop } from "@/components/ui/SectionBackdrop";
-import { getTeamBoard, getTeamStaff } from "@/lib/mock-data";
+import { getPublishedTeam } from "@/server/db/queries/team";
+import { splitPublishedTeam } from "@/lib/team-groups";
 import { BRAND, teamIntro } from "@/lib/site-content";
 import { sectionBackgrounds } from "@/lib/section-backgrounds";
 
@@ -11,9 +12,10 @@ export const metadata: Metadata = {
   title: `Our Team | ${BRAND.name}`,
 };
 
-export default function TeamPage() {
-  const board = getTeamBoard();
-  const staff = getTeamStaff();
+export const revalidate = 300;
+
+export default async function TeamPage() {
+  const { board, staff } = splitPublishedTeam(await getPublishedTeam());
 
   return (
     <>

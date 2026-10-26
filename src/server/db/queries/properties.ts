@@ -2,6 +2,11 @@ import { getDb } from "../index";
 import { mapProperty, type PropertyRow, type PropertyImageRow } from "../mappers";
 import type { Property, PropertyCategory } from "@/lib/types";
 import type { AdminProperty, AdminPropertyInput } from "../admin-types";
+import {
+  applyPropertyCatalogMeta,
+  applyPropertyCatalogMetaList,
+  HOME_LATEST_PROPERTY_SLUGS,
+} from "@/lib/property-catalog-meta";
 
 async function imagesFor(propertyId: string): Promise<PropertyImageRow[]> {
   const db = getDb();
@@ -60,8 +65,8 @@ export async function getPublishedProperties(filters?: {
     .all<PropertyRow>();
 
   const imagesByProperty = await imagesForMany(results.map((r) => r.id));
-  return results.map((row) =>
-    mapProperty(row, imagesByProperty.get(row.id) ?? [])
+  return applyPropertyCatalogMetaList(
+    results.map((row) => mapProperty(row, imagesByProperty.get(row.id) ?? []))
   );
 }
 
@@ -73,8 +78,8 @@ export async function getFeaturedProperties(): Promise<Property[]> {
     )
     .all<PropertyRow>();
   const imagesByProperty = await imagesForMany(results.map((r) => r.id));
-  return results.map((row) =>
-    mapProperty(row, imagesByProperty.get(row.id) ?? [])
+  return applyPropertyCatalogMetaList(
+    results.map((row) => mapProperty(row, imagesByProperty.get(row.id) ?? []))
   );
 }
 
@@ -92,7 +97,17 @@ export async function getPublishedPropertyBySlug(
     .first<PropertyRow>();
   if (!row) return null;
   const images = await imagesFor(row.id);
-  return mapProperty(row, images);
+  return applyPropertyCatalogMeta(mapProperty(row, images));
+}
+
+/** Published properties for the homepage row, in fixed display order. */
+export async function getLatestHomeProperties(): Promise<Property[]> {
+  const ordered: Property[] = [];
+  for (const slug of HOME_LATEST_PROPERTY_SLUGS) {
+    const property = await getPublishedPropertyBySlug(slug);
+    if (property) ordered.push(property);
+  }
+  return ordered;
 }
 
 export async function getAllPropertySlugs(): Promise<string[]> {

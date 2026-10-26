@@ -22,6 +22,8 @@ interface EnquiryFormProps {
   showEnquiryTypePicker?: boolean;
   title?: string;
   submitLabel?: string;
+  /** Pre-filled message body (property detail pages). */
+  defaultMessage?: string;
 }
 
 export function EnquiryForm({
@@ -31,6 +33,7 @@ export function EnquiryForm({
   showEnquiryTypePicker = false,
   title,
   submitLabel = "Submit enquiry",
+  defaultMessage,
 }: EnquiryFormProps) {
   const [state, formAction] = useActionState(submitEnquiryAction, initialEnquiryState);
   // Set purely client-side after mount via a ref, not React state — this
@@ -150,6 +153,7 @@ export function EnquiryForm({
           name="message"
           required={mode !== "inspection"}
           rows={4}
+          defaultValue={defaultMessage}
           placeholder={
             mode === "inspection"
               ? "Anything else Brookfield should know before the visit."
