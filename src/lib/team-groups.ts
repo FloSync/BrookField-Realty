@@ -10,6 +10,8 @@ export function isBoardTeamMember(member: Pick<TeamMember, "position">): boolean
   const position = member.position.trim();
   if (/^director$/i.test(position)) return true;
   if (/\bmanaging director\b/i.test(position)) return true;
+  if (/\bexecutive director\b/i.test(position)) return true;
+  if (/\bboard member\b/i.test(position)) return true;
   if (/\bceo\b/i.test(position)) return true;
   return false;
 }

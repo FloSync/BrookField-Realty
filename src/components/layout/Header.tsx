@@ -13,17 +13,17 @@ export function Header() {
 
   return (
     <header className="sticky top-0 z-40 bg-parchment/95 backdrop-blur border-b hairline">
-      <div className="mx-auto max-w-7xl px-6 sm:px-8 py-3.5 md:py-4 flex items-center justify-between gap-4">
-        <Link href="/" className="flex items-center gap-3 md:gap-4 shrink-0 min-w-0">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-3 md:py-3.5 flex items-center justify-between gap-3 md:gap-4">
+        <Link href="/" className="flex items-center gap-2.5 md:gap-3 shrink-0 min-w-0 max-w-[min(52vw,14rem)] sm:max-w-[min(44vw,16rem)] md:max-w-none">
           <Image
             src="/logo.png"
             alt={BRAND.name}
-            width={220}
-            height={64}
-            className="h-11 sm:h-12 md:h-14 w-auto object-contain"
+            width={280}
+            height={80}
+            className="h-12 sm:h-[3.25rem] md:h-[3.75rem] lg:h-16 w-auto max-w-full object-contain object-left contrast-[1.14] saturate-[1.08] drop-shadow-[0_1px_1px_rgba(20,8,31,0.12)]"
             priority
           />
-          <span className="hidden lg:block text-xs tracking-wide text-slate leading-tight border-l pl-4 hairline">
+          <span className="hidden xl:block text-xs tracking-wide text-slate leading-tight border-l pl-4 hairline shrink-0">
             {BRAND.tagline}
           </span>
         </Link>

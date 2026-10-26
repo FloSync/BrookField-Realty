@@ -5,8 +5,8 @@ export const OFFICE_ADDRESS =
 
 export const OFFICE_HOURS = "Sun – Fri: 9AM – 5PM";
 
-export const PHONE_DISPLAY = "+234 806 750 9840";
-export const PHONE_TEL = "+2348067509840";
+export const PHONE_DISPLAY = "+234 701 073 7317";
+export const PHONE_TEL = "+2347010737317";
 
 export const EMAIL = "contact@brookfieldrealtyltd.com";
 

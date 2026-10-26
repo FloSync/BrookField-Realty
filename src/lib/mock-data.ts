@@ -102,7 +102,7 @@ export function getProjectBySlug(slug: string): Project | undefined {
 export const team: TeamMember[] = [
   {
     id: "fadare-yemi",
-    name: "Fadare Yemi",
+    name: "Fadare Ayodele Yemi",
     position: "Managing Director and CEO",
     bio: "Board — Brookfield Realty.",
     group: "board",
@@ -111,12 +111,20 @@ export const team: TeamMember[] = [
   },
   {
     id: "uzoigwe-sunday",
-    name: "Uzoigwe Sunday",
-    position: "Director",
+    name: "Uzoigwe Emezuo Sunday",
+    position: "Executive Director",
     bio: "Board — Brookfield Realty.",
     group: "board",
     photoUrl:
       "https://brookfieldrealtorltd.com/wp-content/uploads/2025/04/IMG_0380-scaled.jpg",
+  },
+  {
+    id: "chukwuanugo-chukwueloka-mokeme",
+    name: "Chukwuanugo Chukwueloka Mokeme",
+    position: "Board Member",
+    bio: "Board — Brookfield Realty.",
+    group: "board",
+    photoUrl: "/team/chukwuanugo-chukwueloka-mokeme.png",
   },
   {
     id: "chidinma-emeruem",
@@ -153,7 +161,7 @@ export const team: TeamMember[] = [
   {
     id: "happiness-innocent",
     name: "Happiness Innocent",
-    position: "Social Media Analyst / Content Creator",
+    position: "Head of Social Media Analyst / Content Creator",
     bio: "Brookfield Realty team.",
     group: "team",
     photoUrl: "/team/happiness-innocent.png",
