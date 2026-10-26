@@ -1,6 +1,30 @@
 # Production deployment (Cloudflare-first)
 
-This app targets **Cloudflare Pages** (or Workers) with **D1**, optional **R2** (CV uploads), and optional **Email Routing** for notifications. Do **not** commit secrets. Do **not** run `db:seed` against a populated production database expecting a refresh — seed skips non-empty tables.
+This app targets **Cloudflare Workers** via [OpenNext for Cloudflare](https://opennext.js.org/cloudflare) (see root `package.json` scripts), with **D1**, **R2** (CV uploads and OpenNext cache), **Email Routing** for notifications, and optional **Images** binding. Binding names and bucket/database placeholders live in **`wrangler.jsonc`** at the project root (top-level = default worker; `env.staging` = staging worker). Do **not** commit secrets. Do **not** run `db:seed` against a populated production database expecting a refresh — seed skips non-empty tables.
+
+## Local dev vs Cloudflare bindings
+
+- **`USE_LOCAL_DB=true`** — Forces SQLite at `.data/local.db` for reads/writes (`getDb()`). It does **not** guarantee local-only R2 or email: worker bindings from OpenNext preview/dev (`RESUMES`, `NOTIFY`) or env vars (`R2_PUBLIC_BASE_URL`, Resend keys) can still route CV uploads or notifications to remote services.
+- **Avoid accidental remote CV uploads** when developing locally: set `USE_LOCAL_DB=true`, **do not** set `R2_PUBLIC_BASE_URL` in `.env.local` if you want filesystem uploads under `public/uploads/`, and do not run `preview:staging` / `deploy:staging` until staging R2 and URLs are intentionally configured. If a prior session left binding globals set, restart dev or run without Wrangler remote bindings in context.
+
+## Staging worker (OpenNext)
+
+Scripts (require verified Cloudflare resources first — see checklist below):
+
+| Script | Purpose |
+|--------|---------|
+| `npm run preview:staging` | `opennextjs-cloudflare build` then local preview with `--env staging` |
+| `npm run deploy:staging` | Build and deploy worker `brookfield-realty-staging` |
+| `npm run upload:staging` | Build and upload worker bundle without a full deploy |
+
+**Do not run `preview:staging` or `deploy:staging` until** you have verified in the Cloudflare dashboard (or `wrangler` CLI) and updated `wrangler.jsonc` → `env.staging`:
+
+1. **D1** — Real staging `database_id` (replace `STAGING_DATABASE_ID_UNVERIFIED`); schema applied to that database.
+2. **Email** — Verified destination for `send_email` → `NOTIFY` (`destination_address` placeholder replaced).
+3. **R2** — Staging buckets exist for `NEXT_INC_CACHE_R2_BUCKET` and `RESUMES` (`brookfield-opennext-cache-staging`, `brookfield-resumes-staging` or names you chose and wired in config).
+4. **`R2_PUBLIC_BASE_URL`** — Set in the staging worker environment (dashboard or Wrangler vars) to the public base URL for resume objects **after** the staging `RESUMES` bucket and public access (custom domain or `r2.dev`) are confirmed. Do not invent URLs in git.
+
+Until those are real, use `npm run dev` with local SQLite and local uploads only.
 
 ## 1. Create or connect D1
 
@@ -10,9 +34,9 @@ From the project root (with [Wrangler](https://developers.cloudflare.com/workers
 npx wrangler d1 create brookfield-db
 ```
 
-Copy the returned **database id** into `wrangler.toml` → `[[d1_databases]]` → `database_id` (replace `REPLACE_WITH_REAL_DATABASE_ID_AFTER_RUNNING_WRANGLER_D1_CREATE`).
+Copy the returned **database id** into `wrangler.jsonc` → `d1_databases` → `database_id` (replace `REPLACE_WITH_REAL_DATABASE_ID_AFTER_RUNNING_WRANGLER_D1_CREATE`). For staging, create or list a separate D1 and set `env.staging.d1_databases[0].database_id`.
 
-For Pages, bind `DB` to this database in the Cloudflare dashboard (same name as `binding = "DB"` in `wrangler.toml`). Wire `globalThis.__D1_BINDING__` per `src/server/db/README.md` if your adapter requires it.
+On Workers, bindings are declared in `wrangler.jsonc`; OpenNext syncs them at runtime per `src/server/cloudflare/sync-bindings.ts`. See `src/server/db/README.md` for adapter details.
 
 **Alternative host (Node/Vercel):** set `USE_LOCAL_DB=false` and provide `CF_ACCOUNT_ID`, `CF_D1_DATABASE_ID`, and `CF_API_TOKEN` with a token scoped to D1 read/write.
 
@@ -67,17 +91,17 @@ Required for `/admin` access in production.
 
 | Deployment | Configuration |
 |------------|----------------|
-| Cloudflare Pages/Workers | D1 binding `DB`; optional R2 `RESUMES`; optional `send_email` `NOTIFY` per `wrangler.toml` |
+| Cloudflare Workers (OpenNext) | D1 `DB`; R2 `NEXT_INC_CACHE_R2_BUCKET`, `RESUMES`; `send_email` `NOTIFY`; `images` `IMAGES` per `wrangler.jsonc` |
 | Other Node host | `CF_ACCOUNT_ID`, `CF_D1_DATABASE_ID`, `CF_API_TOKEN`, `USE_LOCAL_DB=false` |
 
 ## 6. Notification email
 
 Enquiry and career notifications use `src/server/email/index.ts`:
 
-**Option A — Cloudflare (Pages/Workers):**
+**Option A — Cloudflare Workers:**
 
 1. Verify a destination address in Email Routing.
-2. Set `[[send_email]]` → `destination_address` in `wrangler.toml` to that verified address.
+2. Set `send_email` → `destination_address` in `wrangler.jsonc` (and `env.staging` for staging) to that verified address.
 3. Deploy with the `NOTIFY` binding wired per `src/server/email/cloudflare-email.ts`.
 
 **Option B — Resend (any host):**
@@ -105,12 +129,20 @@ See `src/server/storage/README.md`. Configure `RESUMES` bucket binding on Cloudf
 
 ## 9. Build and deploy
 
+**Local Next.js build (no Workers deploy):**
+
 ```bash
 npm ci
 npm run build
 ```
 
-Deploy the Next.js output with your Cloudflare Pages project connected to GitHub (`FloSync/BrookField-Realty`). Set all environment variables in the dashboard.
+**Staging (after checklist above):**
+
+```bash
+npm run deploy:staging
+```
+
+Set worker secrets and vars (e.g. `SESSION_SECRET`, Turnstile keys, `R2_PUBLIC_BASE_URL`) in the Cloudflare dashboard or via Wrangler for the staging worker. Production deploy uses the top-level `wrangler.jsonc` worker name `brookfield-realty` once placeholders there are replaced and resources exist.
 
 ## 10. Post-deploy checks
 

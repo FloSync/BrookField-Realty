@@ -1,4 +1,5 @@
 import type { D1Like } from "./d1-like";
+import { syncCloudflareBindings } from "../cloudflare/sync-bindings";
 import { getLocalD1 } from "./local-sqlite";
 import { getRemoteD1 } from "./cloudflare-d1";
 
@@ -11,14 +12,17 @@ declare global {
   var __D1_BINDING__: D1Like | undefined;
 }
 
-let cached: D1Like | null = null;
+/** Cached REST or local SQLite adapter — never used when a Worker D1 binding is active. */
+let cachedFallback: D1Like | null = null;
 
 export function getDb(): D1Like {
+  syncCloudflareBindings();
+
   if (globalThis.__D1_BINDING__) {
     return globalThis.__D1_BINDING__;
   }
 
-  if (cached) return cached;
+  if (cachedFallback) return cachedFallback;
 
   const { CF_ACCOUNT_ID, CF_D1_DATABASE_ID, CF_API_TOKEN, USE_LOCAL_DB } =
     process.env;
@@ -26,7 +30,7 @@ export function getDb(): D1Like {
   const wantsRemote =
     USE_LOCAL_DB !== "true" && CF_ACCOUNT_ID && CF_D1_DATABASE_ID && CF_API_TOKEN;
 
-  cached = wantsRemote
+  cachedFallback = wantsRemote
     ? getRemoteD1({
         accountId: CF_ACCOUNT_ID!,
         databaseId: CF_D1_DATABASE_ID!,
@@ -34,5 +38,5 @@ export function getDb(): D1Like {
       })
     : getLocalD1();
 
-  return cached;
+  return cachedFallback;
 }

@@ -36,3 +36,10 @@ const nextConfig: NextConfig = {
 };
 
 export default nextConfig;
+
+// Wrangler env for local `next dev` (loads wrangler.jsonc env.staging bindings).
+// Override via NEXT_DEV_WRANGLER_ENV in .env.local if needed (OpenNext reads it when
+// `environment` is omitted; explicit `environment` here takes precedence).
+import("@opennextjs/cloudflare").then((m) =>
+  m.initOpenNextCloudflareForDev({ environment: "staging" }),
+);

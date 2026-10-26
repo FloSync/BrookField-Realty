@@ -1,3 +1,4 @@
+import { syncCloudflareBindings } from "../cloudflare/sync-bindings";
 import type { EmailSenderLike, EmailMessage } from "./email-like";
 
 // Cloudflare Email Routing's "send_email" binding lets a Worker send email
@@ -17,6 +18,7 @@ declare global {
 }
 
 export function getCloudflareEmailSender(): EmailSenderLike | null {
+  syncCloudflareBindings();
   const binding = globalThis.__EMAIL_BINDING__;
   if (!binding) return null;
   const from = globalThis.__EMAIL_FROM__;

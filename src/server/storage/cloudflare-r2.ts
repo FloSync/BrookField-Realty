@@ -1,3 +1,4 @@
+import { syncCloudflareBindings } from "../cloudflare/sync-bindings";
 import type { StorageLike } from "./storage-like";
 
 // A real R2Bucket binding (env.RESUMES, say) already implements .put() with
@@ -23,10 +24,22 @@ declare global {
   var __R2_PUBLIC_BASE_URL__: string | undefined;
 }
 
+// Without a configured public base URL, refuse the R2 adapter so getStorage()
+// uses local-fs and resume URLs stay valid (/uploads/...) instead of "/key".
+function r2PublicBaseUrl(): string {
+  const fromGlobal = globalThis.__R2_PUBLIC_BASE_URL__;
+  const fromEnv = process.env.R2_PUBLIC_BASE_URL;
+  const base = fromGlobal ?? fromEnv ?? "";
+  return base.trim();
+}
+
 export function getCloudflareR2(): StorageLike | null {
+  syncCloudflareBindings();
   const bucket = globalThis.__R2_BINDING__;
   if (!bucket) return null;
-  const base = globalThis.__R2_PUBLIC_BASE_URL__ ?? "";
+
+  const base = r2PublicBaseUrl();
+  if (!base) return null;
 
   return {
     async put(key: string, data: Uint8Array, contentType: string) {
