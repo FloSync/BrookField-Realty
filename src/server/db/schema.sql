@@ -155,6 +155,7 @@ CREATE TABLE IF NOT EXISTS career_applications (
   phone TEXT NOT NULL,
   cover_message TEXT NOT NULL,
   resume_url TEXT,
+  resume_storage_key TEXT,
   resume_filename TEXT,
   status TEXT NOT NULL DEFAULT 'new' CHECK (status IN ('new', 'reviewed')),
   created_at TEXT NOT NULL DEFAULT (datetime('now'))
@@ -162,3 +163,6 @@ CREATE TABLE IF NOT EXISTS career_applications (
 
 CREATE INDEX IF NOT EXISTS idx_applications_status ON career_applications(status);
 CREATE INDEX IF NOT EXISTS idx_applications_career ON career_applications(career_id);
+
+-- Existing D1 / SQLite databases created before private CV storage:
+-- ALTER TABLE career_applications ADD COLUMN resume_storage_key TEXT;
