@@ -8,8 +8,9 @@
     "start": "cross-env NODE_OPTIONS=--experimental-sqlite next start",
     "lint": "eslint",
     "db:seed": "cross-env NODE_OPTIONS=--experimental-sqlite DOTENV_CONFIG_PATH=.env.local tsx scripts/seed.ts",
+    "db:bootstrap:preview": "cross-env NODE_OPTIONS=--experimental-sqlite DOTENV_CONFIG_PATH=.env.local tsx scripts/bootstrap-preview-d1.ts",
     "db:reset": "rm -rf .data",
-    "preview:staging": "opennextjs-cloudflare build && opennextjs-cloudflare preview --env staging",
+    "preview:staging": "opennextjs-cloudflare build && npm run db:bootstrap:preview && opennextjs-cloudflare preview --env staging",
     "deploy:staging": "opennextjs-cloudflare build && opennextjs-cloudflare deploy --env staging",
     "upload:staging": "opennextjs-cloudflare build && opennextjs-cloudflare upload --env staging",
     "cf-typegen": "wrangler types --env-interface CloudflareEnv cloudflare-env.d.ts"
