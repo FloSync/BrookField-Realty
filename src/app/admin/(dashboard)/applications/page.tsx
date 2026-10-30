@@ -79,13 +79,11 @@ export default async function AdminApplicationsPage({ searchParams }: PageProps)
                     {a.email}
                   </a>
                 </p>
-                {a.resume_url && (
+                {(a.resume_storage_key || a.resume_url || a.resume_filename) && (
                   <p className="sm:col-span-2">
                     <span className="text-slate">CV:</span>{" "}
                     <a
-                      href={a.resume_url}
-                      target="_blank"
-                      rel="noopener noreferrer"
+                      href={`/api/admin/applications/${a.id}/resume`}
                       className="text-brass hover:underline underline-offset-4"
                     >
                       {a.resume_filename ?? "Download"}

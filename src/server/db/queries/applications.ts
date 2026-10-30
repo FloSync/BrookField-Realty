@@ -9,6 +9,7 @@ export interface CareerApplicationRow {
   phone: string;
   cover_message: string;
   resume_url: string | null;
+  resume_storage_key: string | null;
   resume_filename: string | null;
   status: string;
   created_at: string;
@@ -22,6 +23,7 @@ export interface CreateApplicationInput {
   phone: string;
   coverMessage: string;
   resumeUrl?: string;
+  resumeStorageKey?: string;
   resumeFilename?: string;
 }
 
@@ -34,8 +36,8 @@ export async function createCareerApplication(
     .prepare(
       `INSERT INTO career_applications (
         id, career_id, job_title, name, email, phone, cover_message,
-        resume_url, resume_filename, status, created_at
-      ) VALUES (?,?,?,?,?,?,?,?,?,?,?)`
+        resume_url, resume_storage_key, resume_filename, status, created_at
+      ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)`
     )
     .bind(
       id,
@@ -46,12 +48,23 @@ export async function createCareerApplication(
       input.phone,
       input.coverMessage,
       input.resumeUrl ?? null,
+      input.resumeStorageKey ?? null,
       input.resumeFilename ?? null,
       "new",
       new Date().toISOString()
     )
     .run();
   return id;
+}
+
+export async function getCareerApplicationById(
+  id: string
+): Promise<CareerApplicationRow | null> {
+  const db = getDb();
+  return db
+    .prepare("SELECT * FROM career_applications WHERE id = ?")
+    .bind(id)
+    .first<CareerApplicationRow>();
 }
 
 export async function adminListApplications(): Promise<CareerApplicationRow[]> {

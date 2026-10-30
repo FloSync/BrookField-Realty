@@ -74,7 +74,7 @@ export async function sendApplicationNotification(input: {
   email: string;
   phone: string;
   coverMessage: string;
-  resumeUrl?: string | null;
+  hasResume?: boolean;
 }): Promise<void> {
   const lines = [
     `Position: ${input.jobTitle}`,
@@ -82,7 +82,11 @@ export async function sendApplicationNotification(input: {
     `Email: ${input.email}`,
     `Phone: ${input.phone}`,
   ];
-  if (input.resumeUrl) lines.push(`CV: ${input.resumeUrl}`);
+  if (input.hasResume) {
+    lines.push(
+      "CV: attached — sign in to the admin dashboard (Applications) to download."
+    );
+  }
   lines.push("", "Cover message:", input.coverMessage);
 
   try {

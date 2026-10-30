@@ -24,11 +24,24 @@ to start over. CV uploads land in `public/uploads/` locally (see
 provider credentials, are logged to `.data/notifications.log` instead of
 sent (see `src/server/email`).
 
+`USE_LOCAL_DB=true` forces the SQLite file for the database only. It does
+**not** by itself disable remote R2 or email: if the OpenNext dev proxy or
+Wrangler injects `RESUMES` / `NOTIFY`, or you set `R2_PUBLIC_BASE_URL` in
+`.env.local`, career CVs can still upload to real R2. For purely local uploads,
+use `USE_LOCAL_DB=true` and **do not** set `R2_PUBLIC_BASE_URL` (and avoid
+running preview/deploy against unverified remote bindings). See
+`docs/DEPLOYMENT.md` for staging and Cloudflare binding setup.
+
 Visit `/admin/login` with the email/password you set in `.env.local`.
 
 ## Scripts
 
 - `npm run dev` / `npm run build` / `npm run start` — standard Next.js
+- `npm run preview:staging` — OpenNext build + local preview using
+  `wrangler.jsonc` → `env.staging` (wait until staging D1 ID, email, R2, and
+  `R2_PUBLIC_BASE_URL` are verified in Cloudflare; see `docs/DEPLOYMENT.md`)
+- `npm run deploy:staging` — build and deploy the staging worker (`--env staging`)
+- `npm run upload:staging` — build and upload worker assets without a full deploy
 - `npm run lint` — ESLint
 - `npm run db:seed` — create the admin account and load sample content
 - `npm run db:reset` — wipe the local database file
@@ -63,4 +76,5 @@ Pages/Workers — the primary supported path, since it's also the only way
 to get free enquiry-notification emails (Cloudflare Email Routing). For
 other hosts, set `CF_ACCOUNT_ID` / `CF_D1_DATABASE_ID` / `CF_API_TOKEN` for
 D1 over REST, and `RESEND_API_KEY` / `NOTIFY_FROM_EMAIL` / `NOTIFY_TO_EMAIL`
-for email via Resend. `wrangler.toml` has the D1/R2/email binding config.
+for email via Resend. `wrangler.jsonc` has the D1/R2/email/images binding
+config (including `env.staging` for staging preview and deploy).

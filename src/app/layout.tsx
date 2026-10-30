@@ -13,7 +13,11 @@ export const metadata: Metadata = {
     "Comfortable homes and land across Lagos and beyond. Real estate development, land sales, property investment and estate management.",
 };
 
-export default function RootLayout({ children }: LayoutProps<"/">) {
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
     <html lang="en" className="h-full antialiased">
       <body className="min-h-full flex flex-col">

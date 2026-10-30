@@ -3,8 +3,14 @@
 // R2Bucket binding satisfies it directly, so query/action code never needs
 // to know which backend is in use.
 
+export interface StoredObject {
+  data: Uint8Array;
+  contentType: string;
+}
+
 export interface StorageLike {
-  /** Stores a file and returns a URL the public site (or admin) can use to
-   * reach it. */
+  /** Stores a file and returns the storage key (not a public URL). */
   put(key: string, data: Uint8Array, contentType: string): Promise<string>;
+  /** Loads a previously stored object by key, or null if missing. */
+  get(key: string): Promise<StoredObject | null>;
 }

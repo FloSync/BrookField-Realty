@@ -1,0 +1,95 @@
+{
+	"$schema": "node_modules/wrangler/config-schema.json",
+	"main": ".open-next/worker.js",
+	"name": "brookfield-realty",
+	"compatibility_date": "2026-10-26",
+	"compatibility_flags": [
+		"nodejs_compat",
+		"global_fetch_strictly_public"
+	],
+	"assets": {
+		"directory": ".open-next/assets",
+		"binding": "ASSETS"
+	},
+	"services": [
+		{
+			// Self-reference service binding, the service name must match the worker name
+			// see https://opennext.js.org/cloudflare/caching
+			"binding": "WORKER_SELF_REFERENCE",
+			"service": "brookfield-realty"
+		}
+	],
+	"d1_databases": [
+		{
+			"binding": "DB",
+			"database_name": "brookfield-db",
+			"database_id": "REPLACE_WITH_REAL_DATABASE_ID_AFTER_RUNNING_WRANGLER_D1_CREATE"
+		}
+	],
+	"r2_buckets": [
+		// OpenNext incremental cache (see open-next.config.ts)
+		{
+			"binding": "NEXT_INC_CACHE_R2_BUCKET",
+			"bucket_name": "brookfield-opennext-cache"
+		},
+		// CV storage for career applications (see src/server/storage/README.md)
+		{
+			"binding": "RESUMES",
+			"bucket_name": "brookfield-resumes"
+		}
+	],
+	"send_email": [
+		{
+			"name": "NOTIFY",
+			"destination_address": "REPLACE_WITH_VERIFIED_DESTINATION_ADDRESS"
+		}
+	],
+	"images": {
+		// Enable image optimization
+		// see https://opennext.js.org/cloudflare/howtos/image
+		"binding": "IMAGES"
+	},
+	"env": {
+		"staging": {
+			"name": "brookfield-realty-staging",
+			"services": [
+				{
+					// Self-reference must match env worker name (see top-level services)
+					"binding": "WORKER_SELF_REFERENCE",
+					"service": "brookfield-realty-staging"
+				}
+			],
+			"d1_databases": [
+				{
+					"binding": "DB",
+					"database_name": "brookfield-db",
+					// STAGING_DATABASE_ID_UNVERIFIED — set after wrangler d1 create/list
+					"database_id": "6fa9831c-bb07-4c99-b203-fdb0f0a884dd"
+				}
+			],
+			"r2_buckets": [
+				{
+					"binding": "NEXT_INC_CACHE_R2_BUCKET",
+					// STAGING_OPENNEXT_CACHE_BUCKET_UNVERIFIED
+					"bucket_name": "brookfield-opennext-cache-staging"
+				},
+				{
+					"binding": "RESUMES",
+					// STAGING_RESUMES_BUCKET_UNVERIFIED
+					"bucket_name": "brookfield-resumes-staging"
+				}
+			],
+			"send_email": [
+				{
+					"name": "NOTIFY",
+					"destination_address": "contact@brookfieldrealtyltd.com"
+				}
+			],
+			"images": {
+				// Enable image optimization
+				// see https://opennext.js.org/cloudflare/howtos/image
+				"binding": "IMAGES"
+			}
+		}
+	}
+}

@@ -11,6 +11,7 @@
  * See docs/CONTENT_SYNC.md for syncing file-based catalogue edits into D1.
  */
 import "dotenv/config";
+import { pathToFileURL } from "node:url";
 import { getDb } from "../src/server/db/index";
 import { adminAccountCount, createAdmin } from "../src/server/db/queries/admins";
 import { hashPassword } from "../src/server/auth/password";
@@ -147,7 +148,7 @@ async function seedCareers() {
   console.log(`Seeded ${jobOpenings.length} careers.`);
 }
 
-async function main() {
+export async function runSeed() {
   await seedAdmin();
   await seedProperties();
   await seedProjects();
@@ -156,7 +157,13 @@ async function main() {
   console.log("Seed complete.");
 }
 
-main().catch((err) => {
-  console.error(err);
-  process.exit(1);
-});
+const isDirectRun =
+  typeof process.argv[1] === "string" &&
+  pathToFileURL(process.argv[1]).href === import.meta.url;
+
+if (isDirectRun) {
+  runSeed().catch((err) => {
+    console.error(err);
+    process.exit(1);
+  });
+}

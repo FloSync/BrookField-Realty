@@ -53,7 +53,7 @@ export async function submitApplicationAction(
   }
 
   // --- Resume upload (optional) --------------------------------------
-  let resumeUrl: string | undefined;
+  let resumeStorageKey: string | undefined;
   let resumeFilename: string | undefined;
 
   const file = formData.get("resume");
@@ -72,7 +72,7 @@ export async function submitApplicationAction(
       const bytes = new Uint8Array(await file.arrayBuffer());
       const extension = file.name.split(".").pop() || "pdf";
       const key = `resumes/${crypto.randomUUID()}.${extension}`;
-      resumeUrl = await getStorage().put(key, bytes, file.type);
+      resumeStorageKey = await getStorage().put(key, bytes, file.type);
       resumeFilename = file.name;
     } catch (err) {
       console.error("Failed to store resume:", err);
@@ -91,7 +91,7 @@ export async function submitApplicationAction(
       email: parsed.data.email,
       phone: parsed.data.phone,
       coverMessage: parsed.data.coverMessage,
-      resumeUrl,
+      resumeStorageKey,
       resumeFilename,
     });
 
@@ -101,7 +101,7 @@ export async function submitApplicationAction(
       email: parsed.data.email,
       phone: parsed.data.phone,
       coverMessage: parsed.data.coverMessage,
-      resumeUrl,
+      hasResume: Boolean(resumeStorageKey),
     });
 
     revalidatePath("/admin/applications");
